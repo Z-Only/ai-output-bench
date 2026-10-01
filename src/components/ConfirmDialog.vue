@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
+import { useModalFocus } from '../composables/useModalFocus'
 defineProps<{ title: string; description: string; cancelLabel: string; confirmLabel: string }>()
 const emit = defineEmits<{ confirm: []; cancel: [] }>()
 const dialog = ref<HTMLDialogElement>()
-onMounted(() => dialog.value!.showModal())
+useModalFocus(dialog)
 </script>
 <template>
   <dialog ref="dialog" class="confirm-dialog" aria-labelledby="confirm-title" @cancel.prevent="emit('cancel')">

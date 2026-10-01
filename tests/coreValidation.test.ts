@@ -112,15 +112,23 @@ describe('JSON Schema 2020-12 validation', () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => {})
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
-    vi.stubGlobal('Function', function () { throw new Error('CSP blocks generated functions') })
+    vi.stubGlobal('Function', function () { throw new EvalError('CSP blocks generated functions') })
     try {
       const response = evaluateSuite(request({ const: 'private-schema-content' }, [fixture('1', 'invalid')]))
-      expect(['invalid', 'runtime-error']).toContain(response.schemaStatus)
+      expect(response.schemaStatus).toBe('runtime-error')
       expect(response.results[0]!.expectationMatched).toBeNull()
       expect(log).not.toHaveBeenCalled()
       expect(warn).not.toHaveBeenCalled()
       expect(error).not.toHaveBeenCalled()
     } finally { vi.unstubAllGlobals(); log.mockRestore(); warn.mockRestore(); error.mockRestore() }
+  })
+  it.each(['validateSchema', 'compile'] as const)('classifies %s resource exhaustion as runtime failure', method => {
+    const engine = new Ajv2020()
+    vi.spyOn(engine, method).mockImplementation(() => { throw new RangeError('Maximum call stack size exceeded') })
+    const response = evaluateSuite(request(true, [fixture('1', 'invalid')]), () => engine)
+    expect(response.schemaStatus).toBe('runtime-error')
+    expect(response.schemaErrors[0]).toMatchObject({ keyword: 'runtime', message: 'Maximum call stack size exceeded' })
+    expect(response.results[0]).toMatchObject({ status: 'not-run', expectationMatched: null })
   })
   it('normalizes missing validator errors and messages', () => {
     expect(normalizeErrors(null)).toEqual([])

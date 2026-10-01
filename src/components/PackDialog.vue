@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useModalFocus } from '../composables/useModalFocus'
 import { exportPack, importPack } from '../domain/pack'
 import type { TestPack } from '../domain/types'
 import type { MessageKey } from '../i18n'
@@ -12,7 +13,7 @@ const errors = ref<string[]>(check && !check.ok ? check.errors : [])
 const downloadState = ref<'download' | 'downloadRequested' | 'downloadFailed'>('download')
 const clipboardState = ref<'copy' | 'copied' | 'copyFailed'>('copy')
 const title = computed(() => props.t(props.mode))
-onMounted(() => dialog.value!.showModal())
+useModalFocus(dialog)
 function importText() {
   const result = importPack(text.value)
   if (!result.ok) { errors.value = result.errors; return }

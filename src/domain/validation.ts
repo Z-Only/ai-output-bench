@@ -50,6 +50,8 @@ export function evaluateSuite(request: SuiteRequest, engineFactory: () => Engine
       if (!engine.validateSchema(parsed.value as object | boolean)) return fail('invalid', normalizeErrors(engine.errors))
       validate = engine.compile(parsed.value as object | boolean)
     } catch (error) {
+      // CSP denial and resource exhaustion do not establish schema invalidity.
+      if (error instanceof EvalError || error instanceof RangeError) throw error
       return fail('invalid', [issue('schema', error instanceof Error ? error.message : 'Schema compilation failed.')])
     }
     const results: FixtureResult[] = []

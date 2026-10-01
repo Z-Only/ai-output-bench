@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { defineComponent, nextTick } from 'vue'
+import { defineComponent, nextTick, ref } from 'vue'
 import { flushPromises, mount, type VueWrapper } from '@vue/test-utils'
 import App from '../src/App.vue'
 import CodeEditor from '../src/components/CodeEditor.vue'
@@ -25,6 +25,7 @@ const media = { matches: false, addEventListener: vi.fn(), removeEventListener: 
 beforeEach(() => {
   vi.clearAllMocks(); localStorage.clear(); media.matches = false
   vi.stubGlobal('matchMedia', vi.fn(() => media))
+  HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) { this.open = false })
   HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) { this.open = true })
   mocks.run.mockImplementation(async (request: SuiteRequest) => response({ runId: request.runId, results: request.fixtures.map(item => ({ id: item.id, status: item.expected, expectationMatched: true, errors: [] })) }))
 })
@@ -229,4 +230,42 @@ it('mounts the production entry point', async () => {
   await import('../src/main'); await flushPromises()
   expect(target.textContent).toContain('AI Output Bench')
   ;(target as any).__vue_app__.unmount(); target.remove()
+})
+
+
+describe('dialog keyboard focus restoration', () => {
+  it.each(['pack', 'confirm'] as const)('returns focus to the %s dialog opener after Escape and cancellation', async mode => {
+    const wrapper = keep(mount(defineComponent({
+      components: { PackDialog, ConfirmDialog },
+      setup: () => ({ visible: ref(false), mode, pack: EXAMPLE_PACKS[0]!.pack, t }),
+      template: `<div><button id="opener" @click="visible=true">Open</button><PackDialog v-if="visible && mode==='pack'" mode="export" :pack="pack" :t="t" @close="visible=false"/><ConfirmDialog v-if="visible && mode==='confirm'" title="Confirm" description="Replace" cancel-label="Cancel" confirm-label="OK" @cancel="visible=false" @confirm="visible=false"/></div>`,
+    }), { attachTo: document.body }))
+    const opener = wrapper.get('#opener').element as HTMLButtonElement
+    opener.focus(); await wrapper.get('#opener').trigger('click')
+    const dialog = wrapper.get('dialog').element as HTMLDialogElement
+    expect(dialog.open).toBe(true)
+    ;(wrapper.get('dialog button').element as HTMLButtonElement).focus()
+    await wrapper.get('dialog').trigger('cancel'); await nextTick()
+    expect(dialog.open).toBe(false); expect(document.activeElement).toBe(opener)
+    await wrapper.get('#opener').trigger('click')
+    await button(wrapper, mode === 'pack' ? 'Close' : 'Cancel').trigger('click'); await nextTick()
+    expect(document.activeElement).toBe(opener)
+  })
+  it('uses the schema editor when confirmation removes or disables its opener', async () => {
+    for (const action of ['remove', 'disable'] as const) {
+      const wrapper = keep(mount(defineComponent({ components: { ConfirmDialog }, setup: () => ({ visible: ref(false), removed: ref(false), disabled: ref(false), action }), template: `<div><textarea id="schema-editor"/><button v-if="!removed" :disabled="disabled" id="fixture-opener" @click="visible=true">Delete</button><ConfirmDialog v-if="visible" title="Remove?" description="Removed" cancel-label="Cancel" confirm-label="OK" @confirm="visible=false; action==='remove' ? removed=true : disabled=true"/></div>` }), { attachTo: document.body }))
+      ;(wrapper.get('#fixture-opener').element as HTMLButtonElement).focus(); await wrapper.get('#fixture-opener').trigger('click')
+      await button(wrapper, 'OK').trigger('click'); await nextTick()
+      expect(document.activeElement).toBe(wrapper.get('#schema-editor').element)
+      wrapper.unmount(); wrappers.splice(wrappers.indexOf(wrapper), 1)
+    }
+  })
+})
+
+it('closes a modal safely when no element was focused before opening', async () => {
+  const active = vi.spyOn(document, 'activeElement', 'get').mockReturnValue(null)
+  const wrapper = keep(mount(ConfirmDialog, { props: { title: 'Confirm', description: 'No opener', cancelLabel: 'Cancel', confirmLabel: 'OK' } }))
+  active.mockRestore()
+  wrapper.unmount(); wrappers.splice(wrappers.indexOf(wrapper), 1)
+  await nextTick(); expect(HTMLDialogElement.prototype.close).toHaveBeenCalled()
 })
