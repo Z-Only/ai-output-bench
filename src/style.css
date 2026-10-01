@@ -15,3 +15,5 @@
 .shortcut,.privacy-note,.workspace-footer,.limits,.dialect,.count{font-size:12px}.dialog-description{font-size:16px}.fixture-fields label,.fixture-fields input,.fixture-fields select,.issue-message,.issue dl,.issue code,.fixture-select{font-size:14px}.fixture-table thead{font-size:12px}
 
 .result-empty p{font-size:16px}.limits p{font-size:14px}
+/* Keep narrow export labels intact and in DOM order at touch-sized targets. */
+@media (max-width:390px){.pack-dialog .dialog-actions{flex-direction:column;align-items:stretch}.pack-dialog .dialog-actions .button{flex:none;width:100%;min-height:44px;white-space:nowrap;padding:0 12px}}

@@ -2,7 +2,7 @@
 
 ## Automated checks
 
-2026-10-01: 93 tests passed. Production build and strict TypeScript checks passed. Coverage: statements 99.79%, branches 99.48%, functions 100%, lines 100%. Tests include schema correctness, fixture expectations, JSON safety, pack validation, bounded execution, stale response suppression, display preferences, modal focus restoration, and editor gutter scrolling beyond 1,000 lines. Only locale and theme are written to browser storage.
+2026-10-01: 94 tests passed. Production build and strict TypeScript checks passed. Coverage: statements 99.79%, branches 99.48%, functions 100%, lines 100%. Tests include schema correctness, fixture expectations, JSON safety, pack validation, bounded execution, stale response suppression, display preferences, modal focus restoration, and editor gutter scrolling beyond 1,000 lines. Only locale and theme are written to browser storage.
 
 ## Live-browser checks
 
@@ -26,7 +26,7 @@ The implementation was compared against the full-workspace design concept:
 4. Success and diagnostic panels remain semantic and explicit; actual validity and expectation verdict are separate.
 5. Narrow layouts stack the panels and expose fixture labels rather than shrinking a desktop table. Dark mode preserves hierarchy and contrast.
 
-Live inspection found an editor gutter that did not follow textarea scrolling and an emoji-rendered play glyph. The current correction uses a bounded, scrolling line-number window and code-native SVG icons, with an exact shared 24px line height and a regression test beyond 1,000 lines; it also aligns narrow fixture verdict labels and increases regular code, diagnostic, field, and control text to at least 14px (secondary metadata at least 12px). These corrections require a deployment recheck before their live-browser acceptance is claimed.
+Live inspection found an editor gutter that did not follow textarea scrolling and an emoji-rendered play glyph. The current correction uses a bounded, scrolling line-number window and code-native SVG icons, with an exact shared 24px line height and a regression test beyond 1,000 lines; it also aligns narrow fixture verdict labels and increases regular code, diagnostic, field, and control text to at least 14px (secondary metadata at least 12px). The deployed corrections were rechecked at 320 and 390 CSS pixels. On a 1,204-line schema, textarea scrollTop 28,577 produced first gutter line 1,191, exactly matching the shared 24px line-height calculation. The live code font was 14px and metadata 12px. The SVG icons and fixture-label alignment were also visually verified. A final narrow-dialog correction stacks export actions in DOM order at 390px and below, with full-width, no-wrap, 44px targets; its CSSOM constraints pass automated tests and its deployment recheck is pending.
 
 ## Known verification limits
 
