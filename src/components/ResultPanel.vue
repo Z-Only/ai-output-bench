@@ -14,7 +14,7 @@ const schemaProblem = computed(() => props.response !== null && props.response.s
     <header class="panel-heading"><h2 id="results-title">{{ t('results') }}</h2></header>
     <div class="results-body">
       <button v-if="running" class="button primary run-button" @click="$emit('cancel')"><span aria-hidden="true">■</span>{{ t('cancel') }}</button>
-      <button v-else class="button primary run-button" @click="$emit('run')"><span aria-hidden="true">▶</span>{{ t('run') }}</button>
+      <button v-else class="button primary run-button" @click="$emit('run')"><svg class="play-icon" aria-hidden="true" viewBox="0 0 16 16"><path d="M4 2.5 13 8l-9 5.5Z" /></svg>{{ t('run') }}</button>
       <span class="shortcut">{{ t('shortcut') }}</span>
       <div class="result-live" aria-live="polite" aria-atomic="true">
         <p v-if="running" class="summary">{{ t('running') }}</p>

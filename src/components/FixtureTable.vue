@@ -15,7 +15,7 @@ function verdict(result?: FixtureResult) { return result?.expectationMatched ===
         <td :data-label="t('expect')">{{ t(fixture.expected) }}</td>
         <td :data-label="t('output')">{{ t(results.find(result => result.id === fixture.id)?.status ?? 'not-run') }}</td>
         <td :data-label="t('test')" :class="'test-' + verdict(results.find(result => result.id === fixture.id))">{{ t(verdict(results.find(result => result.id === fixture.id))) }}</td>
-        <td class="row-actions"><button class="icon-button" :disabled="fixtures.length >= 50" :aria-label="`${t('duplicate')} ${fixture.name}`" @click="$emit('duplicate', fixture.id)"><span aria-hidden="true">⧉</span></button><button class="icon-button" :aria-label="`${t('remove')} ${fixture.name}`" @click="$emit('remove', fixture.id)"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7M14 10v7" /></svg></button></td>
+        <td class="row-actions"><button class="icon-button" :disabled="fixtures.length >= 50" :aria-label="`${t('duplicate')} ${fixture.name}`" @click="$emit('duplicate', fixture.id)"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="1"/><path d="M16 8V4H4v12h4"/></svg></button><button class="icon-button" :aria-label="`${t('remove')} ${fixture.name}`" @click="$emit('remove', fixture.id)"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 10v7M14 10v7" /></svg></button></td>
       </tr></tbody>
     </table>
     <div v-else class="fixtures-empty"><h3>{{ t('noFixtures') }}</h3><p>{{ t('addHelp') }}</p><button class="button" @click="$emit('add')">{{ t('addFirst') }}</button></div>
