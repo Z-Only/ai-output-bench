@@ -22,3 +22,6 @@ Draft 2020-12. Formats are annotations, not validation rules. Processing runs in
 
 ## Readability correction
 Regular editable code, diagnostic text, fields, and controls use at least 14px text; body content uses 16px, secondary metadata at least 12px. Code and virtual gutter share an exact 24px line height to prevent long-document subpixel drift. Where these sizes need room, the interface wraps or grows vertically rather than shrinking text.
+
+## Text contrast correction
+Brand orange is unchanged. Light-theme primary controls use #c83f0b (hover #b63708) with white text. Dark-theme primary controls keep the vivid orange #f76b32 (hover #fa7d4b) with ink #20211f. Selected-template text uses a contrast-safe orange tone. Actual CSS tokens for primary, muted, diagnostic, selected-template, and success text are checked against the WCAG 2.2 normal-text minimum of 4.5:1 in a regression test; Input, select, outlined-button, and pack-textarea boundaries use dedicated #858a83 (light) and #707b6c (dark) tokens with at least 3:1 contrast against adjacent regular surfaces. Decorative panel lines are unchanged. These are targeted color-contrast checks, not a claim of full WCAG conformance.
