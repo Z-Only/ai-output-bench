@@ -1,6 +1,18 @@
 # AI Output Bench
 
+[Open the public workbench](https://ai-output-bench.m2-zhao.chatgpt.site)
+
 A local-first contract test bench for JSON produced by AI systems. Edit a JSON Schema, run named valid/invalid fixtures, inspect exact failure paths, and export a reusable test pack. It runs real validation in your browser; it does not call an AI model or judge factual accuracy.
+
+## Quick start
+
+1. Run the Product extraction or Support triage example
+2. Select a fixture and inspect its output, expectation, and diagnostic JSON Pointers
+3. Edit the schema or output, then run all tests (Ctrl/⌘ + Enter)
+4. Add positive and negative examples before changing a contract
+5. Export the pack and save its full JSON; paste it into Import pack to resume later
+
+Changes stay in memory. Export before closing or reloading the page. Importing a valid pack replaces the current workspace. Loading a template or removing a fixture asks for confirmation.
 
 ## Development
 
@@ -30,6 +42,16 @@ This is a developer diagnostic, not a production security boundary or a guarante
 Schemas and fixture text are processed locally and are not saved automatically. Only interface preferences may be stored locally. Explicit test-pack export/import lets you keep work. Exported packs include your schema and all fixture contents: review them before sharing or committing. No model key, analytics, remote font, or account is needed to use the tool. The hosting provider still handles ordinary requests needed to load the website.
 
 A selectable export preview is available even when the browser does not complete a file download. Imported packs must validate in full before replacing current work.
+
+## Validation limits
+
+- Schema: 128 KiB UTF-8
+- Each fixture: 256 KiB UTF-8; at most 50 fixtures
+- Schema plus fixture text: 2 MiB
+- Nesting: 64 levels; 10,000 schema values and 100,000 values per fixture
+- Worker deadline: 2 seconds, followed by termination
+
+Limits describe this workbench, not a model provider. JSON syntax errors can meet an Invalid expectation; resource-limit failures cannot. Number checks reject non-finite values and unsafe integers; other decimal values follow JavaScript floating-point semantics.
 
 ## Contribution workflow
 

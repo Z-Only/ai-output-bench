@@ -39,8 +39,19 @@ describe('editor and dialogs', () => {
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['<script>not executable</script>'])
     expect(wrapper.find('script').exists()).toBe(false)
     await wrapper.setProps({ modelValue: '\n'.repeat(1100), readonly: true })
-    expect(wrapper.findAll('.line-numbers span')).toHaveLength(1000)
+    expect(wrapper.findAll('.line-numbers span')).toHaveLength(50)
     expect(wrapper.get('textarea').attributes('readonly')).toBeDefined()
+    wrapper.get('textarea').element.scrollTop = 240
+    await wrapper.get('textarea').trigger('scroll')
+    expect(wrapper.get('.line-numbers span').text()).toBe('11')
+    expect(wrapper.get('.line-number-window').attributes('style')).toContain('translateY(0px)')
+    wrapper.get('textarea').element.scrollTop = 245
+    await wrapper.get('textarea').trigger('scroll')
+    expect(wrapper.get('.line-number-window').attributes('style')).toContain('-5px')
+    wrapper.get('textarea').element.scrollTop = 24000
+    await wrapper.get('textarea').trigger('scroll')
+    expect(wrapper.get('.line-numbers span').text()).toBe('1001')
+    expect(wrapper.get('.line-number-window').attributes('style')).toContain('translateY(0px)')
   })
   it('confirms or cancels with native modal focus containment', async () => {
     const wrapper = keep(mount(ConfirmDialog, { props: { title: 'Replace?', description: 'Content is replaced', cancelLabel: 'Keep', confirmLabel: 'Replace' } }))
@@ -94,7 +105,7 @@ describe('test verdicts and diagnostics', () => {
   it('distinguishes initial, running, stale, empty and result states', async () => {
     const wrapper = keep(mount(ResultPanel, { props: { response: null, fixture, running: false, stale: false, t } }))
     expect(wrapper.text()).toContain('Ready when you are')
-    await button(wrapper, '▶Run all tests').trigger('click'); expect(wrapper.emitted('run')).toHaveLength(1)
+    await button(wrapper, 'Run all tests').trigger('click'); expect(wrapper.emitted('run')).toHaveLength(1)
     await wrapper.setProps({ running: true }); expect(wrapper.text()).toContain('Running tests')
     await button(wrapper, '■Cancel run').trigger('click'); expect(wrapper.emitted('cancel')).toHaveLength(1)
     await wrapper.setProps({ running: false, stale: true }); expect(wrapper.text()).toContain('Inputs changed')
